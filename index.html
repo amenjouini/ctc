@@ -1,602 +1,748 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Crack The Code - 1vComputer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <style>
-        html, body {
-            height: 100%;
-            overflow: hidden; /* Prevents page-level scrolling */
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .perspective-container {
-            perspective: 1000px;
-        }
-        .card-flip {
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-        }
-        .card-flip.is-flipped {
-            transform: rotateY(180deg);
-        }
-        .card-front, .card-back {
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-        }
-        .card-back {
-            transform: rotateY(180deg);
-        }
-        .number-pad-btn {
-            transition: all 0.2s ease;
-        }
-        .number-pad-btn:active {
-            transform: scale(0.9);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
-        }
-        .guess-input.active {
-            box-shadow: 0 0 0 3px rgb(99 102 241 / 50%);
-        }
-        
-        /* Custom scrollbar styling */
-        .guess-history::-webkit-scrollbar {
-            width: 8px;
-        }
-        .guess-history::-webkit-scrollbar-track {
-            background: #1f2937; /* Slightly darker than the container */
-        }
-        .guess-history::-webkit-scrollbar-thumb {
-            background-color: #4b5563;
-            border-radius: 4px;
-        }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden; /* Prevents page-level scrolling */
+      }
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .perspective-container {
+        perspective: 1000px;
+      }
+      .card-flip {
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+      }
+      .card-flip.is-flipped {
+        transform: rotateY(180deg);
+      }
+      .card-front,
+      .card-back {
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+      }
+      .card-back {
+        transform: rotateY(180deg);
+      }
+      .number-pad-btn {
+        transition: all 0.2s ease;
+      }
+      .number-pad-btn:active {
+        transform: scale(0.9);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+      }
+      .number-pad-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      .guess-input.active {
+        box-shadow: 0 0 0 3px rgb(99 102 241 / 50%);
+      }
 
-        /* Reserve space for scrollbar to prevent layout shift */
-        .guess-history {
-            scrollbar-gutter: stable;
-        }
+      /* Custom scrollbar styling */
+      .guess-history::-webkit-scrollbar {
+        width: 8px;
+      }
+      .guess-history::-webkit-scrollbar-track {
+        background: #1f2937; /* Slightly darker than the container */
+      }
+      .guess-history::-webkit-scrollbar-thumb {
+        background-color: #4b5563;
+        border-radius: 4px;
+      }
 
-        /* Hide scrollbar for non-T columns but keep functionality */
-        #your-guesses-history::-webkit-scrollbar,
-        #v-feedback-history::-webkit-scrollbar {
-            background-color: transparent;
-        }
-        #your-guesses-history::-webkit-scrollbar-thumb,
-        #v-feedback-history::-webkit-scrollbar-thumb {
-            background-color: transparent;
-        }
-        #your-guesses-history,
-        #v-feedback-history,
-        #t-feedback-history {
-             -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
-        
-        /* --- INTERACTION STYLES --- */
-        /* Base styles for all history row items */
-        .history-row-item {
-            transition: transform 0.2s ease-out;
-            position: relative;
-        }
-        /* Base transition for the inner boxes that change color */
-        #your-guesses-history .history-row-item > div,
-        #v-feedback-history .history-row-item,
-        #t-feedback-history .history-row-item {
-             transition: background-color 0.2s ease-out;
-        }
-        
-        /* Transform effect for the entire row on hover/select */
-        .history-row-hovered,
-        .history-row-selected {
-            transform: scale(1.03);
-            z-index: 10;
-        }
+      /* Reserve space for scrollbar to prevent layout shift */
+      .guess-history {
+        scrollbar-gutter: stable;
+      }
 
-        /* HOVER: Change color of the inner boxes */
-        #your-guesses-history .history-row-hovered > div,
-        #v-feedback-history .history-row-hovered,
-        #t-feedback-history .history-row-hovered {
-            background-color: rgba(96, 108, 129, 0.5); /* Lighter gray hover */
-        }
+      /* Hide scrollbar for non-T columns but keep functionality */
+      #your-guesses-history::-webkit-scrollbar,
+      #v-feedback-history::-webkit-scrollbar,
+      #t-feedback-history::-webkit-scrollbar {
+        background-color: transparent;
+      }
+      #your-guesses-history::-webkit-scrollbar-thumb,
+      #v-feedback-history::-webkit-scrollbar-thumb,
+      #t-feedback-history::-webkit-scrollbar-thumb {
+        background-color: transparent;
+      }
+      #your-guesses-history,
+      #v-feedback-history,
+      #t-feedback-history {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+      }
 
-        /* SELECTED: Change color of the inner boxes */
-        #your-guesses-history .history-row-selected > div,
-        #v-feedback-history .history-row-selected,
-        #t-feedback-history .history-row-selected {
-            background-color: rgba(99, 102, 241, 0.4); /* Indigo color for selection */
-        }
+      /* --- INTERACTION STYLES --- */
+      /* Base styles for all history row items */
+      .history-row-item {
+        transition: transform 0.2s ease-out;
+        position: relative;
+      }
+      /* Base transition for the inner boxes that change color */
+      #your-guesses-history .history-row-item > div,
+      #v-feedback-history .history-row-item,
+      #t-feedback-history .history-row-item {
+        transition: background-color 0.2s ease-out;
+      }
 
-        .modal {
-            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-        }
-        .modal-content {
-            transition: transform 0.3s ease-in-out;
-        }
+      /* Transform effect for the entire row on hover/select */
+      .history-row-hovered,
+      .history-row-selected {
+        transform: scale(1.03);
+        z-index: 10;
+      }
+
+      /* HOVER: Change color of the inner boxes */
+      #your-guesses-history .history-row-hovered > div,
+      #v-feedback-history .history-row-hovered,
+      #t-feedback-history .history-row-hovered {
+        background-color: rgba(96, 108, 129, 0.5); /* Lighter gray hover */
+      }
+
+      /* SELECTED: Change color of the inner boxes */
+      #your-guesses-history .history-row-selected > div,
+      #v-feedback-history .history-row-selected,
+      #t-feedback-history .history-row-selected {
+        background-color: rgba(
+          99,
+          102,
+          241,
+          0.4
+        ); /* Indigo color for selection */
+      }
+
+      .modal {
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .modal-content {
+        transition: transform 0.3s ease-in-out;
+      }
     </style>
-</head>
-<body class="bg-gray-900 text-white flex items-center justify-center h-screen">
+  </head>
+  <body
+    class="bg-gray-900 text-white flex items-center justify-center h-screen"
+  >
+    <div
+      id="game-container"
+      class="w-full max-w-lg mx-auto bg-gray-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden h-full max-h-[900px] md:h-auto"
+    >
+      <!-- Top Bar -->
+      <header
+        class="bg-gray-900/50 backdrop-blur-sm p-3 flex items-center justify-between border-b border-gray-700 flex-shrink-0"
+      >
+        <button class="text-gray-400 hover:text-white transition-colors">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+        <h1 class="text-xl font-bold tracking-wider uppercase">
+          Crack The Code
+        </h1>
+        <div class="w-8"></div>
+      </header>
 
-    <div id="game-container" class="w-full max-w-lg mx-auto bg-gray-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden h-full max-h-[900px] md:h-auto">
-        
-        <!-- Top Bar -->
-        <header class="bg-gray-900/50 backdrop-blur-sm p-3 flex items-center justify-between border-b border-gray-700 flex-shrink-0">
-            <button class="text-gray-400 hover:text-white transition-colors"><i class="fas fa-bars text-xl"></i></button>
-            <h1 class="text-xl font-bold tracking-wider uppercase">Crack The Code</h1>
-            <div class="w-8"></div>
-        </header>
-
-        <!-- Opponent Info -->
-        <section class="p-3 flex items-center gap-3 bg-gray-800 border-b border-gray-700 flex-shrink-0">
-            <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-xl">
-                <i class="fas fa-robot"></i>
-            </div>
-            <div>
-                <span id="opponent-name" class="font-semibold">Computer</span>
-                <div id="game-status" class="text-xs text-gray-400">Try to crack the code!</div>
-            </div>
-        </section>
-
-        <!-- Main Game Area -->
-        <main class="grid md:grid-cols-12 gap-4 p-4 flex-grow overflow-y-auto">
-            <!-- Guesses Area (Left) -->
-            <div class="md:col-span-7 grid grid-cols-[4fr_1fr_1fr] gap-2">
-                 <!-- Your Guesses Column -->
-                <div class="flex flex-col">
-                    <h2 class="text-sm font-semibold text-center text-gray-400 mb-2">YOUR GUESSES</h2>
-                    <div id="your-guesses-history" class="guess-history bg-gray-900/50 rounded-lg p-2 flex-grow h-64 overflow-y-auto space-y-2">
-                        <!-- History will be populated here -->
-                    </div>
-                </div>
-
-                <!-- Feedback V Column -->
-                <div class="flex flex-col">
-                    <h2 class="text-sm font-semibold text-center text-gray-400 mb-2">V</h2>
-                    <div id="v-feedback-history" class="guess-history bg-gray-900/50 rounded-lg p-2 flex-grow h-64 overflow-y-auto space-y-2">
-                        <!-- V feedback -->
-                    </div>
-                </div>
-
-                <!-- Feedback T Column -->
-                <div class="flex flex-col">
-                    <h2 class="text-sm font-semibold text-center text-gray-400 mb-2">T</h2>
-                    <div id="t-feedback-history" class="guess-history bg-gray-900/50 rounded-lg p-2 flex-grow h-64 overflow-y-auto space-y-2">
-                        <!-- T feedback -->
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- Code Area (Right) -->
-            <div class="md:col-span-5 flex flex-col gap-4">
-                <!-- Your Code -->
-                <div>
-                    <h2 class="text-sm font-semibold text-center text-gray-400 mb-2">YOUR CODE</h2>
-                    <div id="your-code-display" class="grid grid-cols-4 gap-2">
-                         <div class="aspect-square bg-gray-700 rounded-lg flex items-center justify-center text-2xl font-bold">?</div>
-                         <div class="aspect-square bg-gray-700 rounded-lg flex items-center justify-center text-2xl font-bold">?</div>
-                         <div class="aspect-square bg-gray-700 rounded-lg flex items-center justify-center text-2xl font-bold">?</div>
-                         <div class="aspect-square bg-gray-700 rounded-lg flex items-center justify-center text-2xl font-bold">?</div>
-                    </div>
-                </div>
-                 <!-- Opponent's Guesses (now static) -->
-                <div>
-                    <h2 class="text-sm font-semibold text-center text-gray-400 mb-2">COMPUTER'S GUESS</h2>
-                    <div id="opponent-guess-display" class="grid grid-cols-4 gap-2">
-                         <div class="aspect-square bg-gray-700 rounded-lg flex items-center justify-center text-2xl font-bold text-gray-500">-</div>
-                         <div class="aspect-square bg-gray-700 rounded-lg flex items-center justify-center text-2xl font-bold text-gray-500">-</div>
-                         <div class="aspect-square bg-gray-700 rounded-lg flex items-center justify-center text-2xl font-bold text-gray-500">-</div>
-                         <div class="aspect-square bg-gray-700 rounded-lg flex items-center justify-center text-2xl font-bold text-gray-500">-</div>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <!-- Player Input Area -->
-        <footer class="p-4 border-t border-gray-700 flex-shrink-0">
-            <div id="player-input-area" class="mb-4 opacity-50 pointer-events-none">
-                <div id="current-guess-inputs" class="grid grid-cols-4 gap-2 mb-2">
-                    <input type="text" maxlength="1" readonly class="guess-input aspect-square text-center bg-gray-700 border-2 border-transparent focus:border-indigo-500 focus:outline-none rounded-lg text-2xl font-bold transition-all">
-                    <input type="text" maxlength="1" readonly class="guess-input aspect-square text-center bg-gray-700 border-2 border-transparent focus:border-indigo-500 focus:outline-none rounded-lg text-2xl font-bold transition-all">
-                    <input type="text" maxlength="1" readonly class="guess-input aspect-square text-center bg-gray-700 border-2 border-transparent focus:border-indigo-500 focus:outline-none rounded-lg text-2xl font-bold transition-all">
-                    <input type="text" maxlength="1" readonly class="guess-input aspect-square text-center bg-gray-700 border-2 border-transparent focus:border-indigo-500 focus:outline-none rounded-lg text-2xl font-bold transition-all">
-                </div>
-            </div>
-            <div id="numpad-and-actions" class="flex gap-4">
-                <div id="number-pad" class="grid grid-cols-5 gap-2 flex-grow">
-                    <!-- Number pad will be generated here -->
-                </div>
-                <div class="flex flex-col gap-2 w-20">
-                    <button id="clear-button" class="number-pad-btn h-full bg-yellow-500 text-black font-bold rounded-lg text-xl flex items-center justify-center"><i class="fas fa-backspace"></i></button>
-                    <button id="submit-button" class="number-pad-btn h-full bg-green-500 text-white font-bold rounded-lg text-xl flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
-                </div>
-            </div>
-        </footer>
-    </div>
-    
-    <!-- Modals -->
-    <div id="main-modal" class="modal fixed inset-0 bg-black/70 flex items-center justify-center z-50 invisible opacity-0">
-        <div class="modal-content bg-gray-800 rounded-2xl shadow-xl p-8 max-w-sm w-full transform scale-95">
-            <!-- Content will be injected here -->
+      <!-- Opponent Info -->
+      <section
+        class="p-3 flex items-center gap-3 bg-gray-800 border-b border-gray-700 flex-shrink-0"
+      >
+        <div
+          class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-xl"
+        >
+          <i class="fas fa-robot"></i>
         </div>
+        <div>
+          <span id="opponent-name" class="font-semibold">Computer</span>
+          <div id="game-status" class="text-xs text-gray-400">
+            Try to crack the code!
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Game Area -->
+      <main class="grid md:grid-cols-12 gap-4 p-4 flex-grow overflow-y-auto">
+        <!-- Guesses Area (Left) -->
+        <div class="md:col-span-7 grid grid-cols-[4fr_1fr_1fr] gap-2">
+          <!-- Your Guesses Column -->
+          <div class="flex flex-col">
+            <h2 class="text-sm font-semibold text-center text-gray-400 mb-2">
+              YOUR GUESSES
+            </h2>
+            <div
+              id="your-guesses-history"
+              class="guess-history bg-gray-900/50 rounded-lg p-2 flex-grow h-64 overflow-y-auto space-y-2"
+            >
+              <!-- History will be populated here -->
+            </div>
+          </div>
+
+          <!-- Feedback V Column -->
+          <div class="flex flex-col">
+            <h2 class="text-sm font-semibold text-center text-gray-400 mb-2">
+              V
+            </h2>
+            <div
+              id="v-feedback-history"
+              class="guess-history bg-gray-900/50 rounded-lg p-2 flex-grow h-64 overflow-y-auto space-y-2"
+            >
+              <!-- V feedback -->
+            </div>
+          </div>
+
+          <!-- Feedback T Column -->
+          <div class="flex flex-col">
+            <h2 class="text-sm font-semibold text-center text-gray-400 mb-2">
+              T
+            </h2>
+            <div
+              id="t-feedback-history"
+              class="guess-history bg-gray-900/50 rounded-lg p-2 flex-grow h-64 overflow-y-auto space-y-2"
+            >
+              <!-- T feedback -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats & Instructions Area (Right) -->
+        <div class="md:col-span-5 flex flex-col gap-4">
+          <div class="bg-gray-900/50 rounded-lg p-3">
+            <h2
+              class="text-sm font-semibold text-center text-gray-400 mb-2 uppercase tracking-wider"
+            >
+              Stats
+            </h2>
+            <div class="space-y-2">
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-300">Guesses:</span>
+                <span id="guess-count" class="font-bold text-lg text-white"
+                  >0</span
+                >
+              </div>
+
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-300">Best Score:</span>
+                <span id="best-score" class="font-bold text-lg text-yellow-400"
+                  >--</span
+                >
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-900/50 rounded-lg p-3 flex-grow">
+            <h2
+              class="text-sm font-semibold text-center text-gray-400 mb-3 uppercase tracking-wider"
+            >
+              How to Play
+            </h2>
+            <ul class="space-y-3 text-sm">
+              <li class="flex items-start">
+                <span class="font-bold text-indigo-400 w-6 text-center mr-2"
+                  >V</span
+                >
+                <span class="text-gray-300"
+                  >Correct number, but in the wrong position.</span
+                >
+              </li>
+              <li class="flex items-start">
+                <span class="font-bold text-green-400 w-6 text-center mr-2"
+                  >T</span
+                >
+                <span class="text-gray-300"
+                  >Correct number AND in the correct position.</span
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </main>
+
+      <!-- Player Input Area -->
+      <footer class="p-4 border-t border-gray-700 flex-shrink-0">
+        <div id="player-input-area">
+          <div id="current-guess-inputs" class="grid grid-cols-4 gap-2 mb-2">
+            <input
+              type="text"
+              maxlength="1"
+              readonly
+              class="guess-input aspect-square text-center bg-gray-700 border-2 border-transparent focus:border-indigo-500 focus:outline-none rounded-lg text-2xl font-bold transition-all"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              readonly
+              class="guess-input aspect-square text-center bg-gray-700 border-2 border-transparent focus:border-indigo-500 focus:outline-none rounded-lg text-2xl font-bold transition-all"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              readonly
+              class="guess-input aspect-square text-center bg-gray-700 border-2 border-transparent focus:border-indigo-500 focus:outline-none rounded-lg text-2xl font-bold transition-all"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              readonly
+              class="guess-input aspect-square text-center bg-gray-700 border-2 border-transparent focus:border-indigo-500 focus:outline-none rounded-lg text-2xl font-bold transition-all"
+            />
+          </div>
+        </div>
+        <div id="numpad-and-actions" class="flex gap-4">
+          <div id="number-pad" class="grid grid-cols-5 gap-2 flex-grow">
+            <!-- Number pad will be generated here -->
+          </div>
+          <div class="flex flex-col gap-2 w-20">
+            <button
+              id="clear-button"
+              class="number-pad-btn h-full bg-yellow-500 text-black font-bold rounded-lg text-xl flex items-center justify-center"
+            >
+              <i class="fas fa-backspace"></i>
+            </button>
+            <button
+              id="submit-button"
+              class="number-pad-btn h-full bg-green-500 text-white font-bold rounded-lg text-xl flex items-center justify-center"
+            >
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </footer>
     </div>
 
+    <!-- Modals -->
+    <div
+      id="main-modal"
+      class="modal fixed inset-0 bg-black/70 flex items-center justify-center z-50 invisible opacity-0"
+    >
+      <div
+        class="modal-content bg-gray-800 rounded-2xl shadow-xl p-8 max-w-sm w-full transform scale-95"
+      >
+        <!-- Content will be injected here -->
+      </div>
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- Constants ---
-            const computerSecretCode = ['1', '2', '5', '6'];
+      document.addEventListener("DOMContentLoaded", () => {
+        // --- Constants ---
+        // const computerSecretCode = ["1", "2", "5", "6"];
+        // --- Game State ---
+        let secretCode = [];
+        let state = {
+          currentGuess: ["", "", "", ""],
+          activeInputIndex: 0,
+          gameOver: true,
+          guessCount: 0,
+          bestScore: null,
+        };
 
-            // --- UI Elements ---
-            const ui = {
-                gameStatus: document.getElementById('game-status'),
-                yourCodeDisplay: document.getElementById('your-code-display'),
-                yourGuessesHistory: document.getElementById('your-guesses-history'),
-                vFeedbackHistory: document.getElementById('v-feedback-history'),
-                tFeedbackHistory: document.getElementById('t-feedback-history'),
-                currentGuessInputs: document.querySelectorAll('#current-guess-inputs .guess-input'),
-                numberPad: document.getElementById('number-pad'),
-                clearButton: document.getElementById('clear-button'),
-                submitButton: document.getElementById('submit-button'),
-                modal: document.getElementById('main-modal'),
-                modalContent: document.querySelector('.modal-content'),
-                playerInputArea: document.getElementById('player-input-area')
-            };
-            
-            // --- Game State ---
-            let state = {
-                mySecretCode: [],
-                currentGuess: ["", "", "", ""],
-                activeInputIndex: 0,
-                gameOver: true,
-                guessCount: 0,
-            };
+        // --- UI Elements ---
+        const ui = {
+          gameStatus: document.getElementById("game-status"),
+          yourGuessesHistory: document.getElementById("your-guesses-history"),
+          vFeedbackHistory: document.getElementById("v-feedback-history"),
+          tFeedbackHistory: document.getElementById("t-feedback-history"),
+          numberPadButtons: {},
+          guessCount: document.getElementById("guess-count"),
+          bestScore: document.getElementById('best-score'),
+          currentGuessInputs: document.querySelectorAll(
+            "#current-guess-inputs .guess-input"
+          ),
+          numberPad: document.getElementById("number-pad"),
+          clearButton: document.getElementById("clear-button"),
+          submitButton: document.getElementById("submit-button"),
+          modal: document.getElementById("main-modal"),
+          modalContent: document.querySelector(".modal-content"),
+          playerInputArea: document.getElementById("player-input-area"),
+        };
 
-            // --- Main App Logic ---
+        // --- Main App Logic ---
 
-            const showModal = (content, allowClose = true) => {
-                ui.modalContent.innerHTML = content;
-                ui.modal.classList.remove('invisible', 'opacity-0');
-                ui.modalContent.classList.remove('scale-95');
+        // This entire function is new
+        const showModal = (content, allowClose = true) => {
+          ui.modalContent.innerHTML = content;
+          ui.modal.classList.remove("invisible", "opacity-0");
+          ui.modalContent.classList.remove("scale-95");
+
+          if (!allowClose) {
+            ui.modal.dataset.allowClose = "false";
+          } else {
+            ui.modal.dataset.allowClose = "true";
+          }
+        };
+
+        const hideModal = () => {
+          ui.modal.classList.add("invisible", "opacity-0");
+          ui.modalContent.classList.add("scale-95");
+        };
+
+        ui.modal.addEventListener("click", (e) => {
+          if (e.target === ui.modal && ui.modal.dataset.allowClose === "true") {
+            hideModal();
+          }
+        });
+
+        const initNumpad = () => {
+          ui.numberPad.innerHTML = "";
+          const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+          numbers.forEach((num) => {
+            const btn = document.createElement("button");
+            btn.className =
+              "number-pad-btn bg-gray-700 hover:bg-gray-600 font-bold rounded-lg h-14 text-2xl";
+            btn.textContent = num;
+            btn.onclick = () => handleNumpadInput(num.toString());
+            ui.numberPad.appendChild(btn);
+            ui.numberPadButtons[num] = btn; // Store button reference
+          });
+        };
+         const updateNumpadState = () => {
+            const usedNumbers = new Set(state.currentGuess.filter(n => n !== ""));
+
+            for (const num in ui.numberPadButtons) {
+                const button = ui.numberPadButtons[num];
+                let isDisabled = false;
+
+                // Disable if number is already used in the current guess
+                if (usedNumbers.has(num)) {
+                    isDisabled = true;
+                }
+
+                // Disable '0' if it's the first input position
+                if (state.activeInputIndex === 0 && num === '0') {
+                    isDisabled = true;
+                }
                 
-                if (!allowClose) {
-                     ui.modal.dataset.allowClose = "false";
-                } else {
-                     ui.modal.dataset.allowClose = "true";
-                }
-            };
+                button.disabled = isDisabled;
+            }
+        };
 
-            const hideModal = () => {
-                ui.modal.classList.add('invisible', 'opacity-0');
-                ui.modalContent.classList.add('scale-95');
-            };
-            
-            ui.modal.addEventListener('click', (e) => {
-                if (e.target === ui.modal && ui.modal.dataset.allowClose === "true") {
-                    hideModal();
-                }
+        const handleNumpadInput = (value) => {
+          if (state.activeInputIndex > 3 || state.gameOver) return;
+
+          state.currentGuess[state.activeInputIndex] = value;
+          ui.currentGuessInputs[state.activeInputIndex].value = value;
+          updateNumpadState();
+
+          if (state.activeInputIndex < 3) {
+            state.activeInputIndex++;
+            updateActiveInput();
+          }
+        };
+
+        const updateActiveInput = () => {
+          if (state.gameOver) {
+            ui.currentGuessInputs.forEach((input) =>
+              input.classList.remove("active")
+            );
+            return;
+          }
+          ui.currentGuessInputs.forEach((input, index) => {
+            input.classList.toggle("active", index === state.activeInputIndex);
+          });
+          updateNumpadState();
+        };
+
+        const handleClear = () => {
+          state.currentGuess = ["", "", "", ""];
+          ui.currentGuessInputs.forEach((input) => (input.value = ""));
+          state.activeInputIndex = 0;
+          updateActiveInput();
+        };
+
+        const handleSubmit = () => {
+          if (state.gameOver || state.currentGuess.includes("")) {
+            showModal(
+              `<h2 class="text-xl font-bold text-center mb-4 text-white">Invalid Guess</h2><p class="text-center text-gray-300">Please enter a complete 4-digit code.</p>`
+            );
+            return;
+          }
+
+          const feedback = calculateFeedback(
+            state.currentGuess,
+            secretCode
+          );
+          addGuessToHistoryUI(state.currentGuess, feedback);
+
+          if (feedback.t === 4) {
+            handleGameOver(true); // Player wins
+          } else {
+            handleClear();
+          }
+        };
+
+        ui.clearButton.onclick = handleClear;
+        ui.submitButton.onclick = handleSubmit;
+        ui.currentGuessInputs.forEach((input, index) => {
+          input.addEventListener("click", () => {
+            if (state.gameOver) return;
+            state.activeInputIndex = index;
+            updateActiveInput();
+          });
+        });
+
+        const startGame = () => {
+          state.gameOver = false;
+          generateSecretCode();
+          ui.playerInputArea.classList.remove(
+            "opacity-50",
+            "pointer-events-none"
+          );
+          updateActiveInput();
+        };
+
+        const generateSecretCode = () => {
+            const digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            // Shuffle the array
+            for (let i = digits.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [digits[i], digits[j]] = [digits[j], digits[i]];
+            }
+
+            // Ensure first digit is not '0'
+            if (digits[0] === '0') {
+                // Find a non-zero digit to swap with
+                const nonZeroIndex = digits.findIndex((d, i) => i > 0 && d !== '0');
+                [digits[0], digits[nonZeroIndex]] = [digits[nonZeroIndex], digits[0]];
+            }
+
+            secretCode = digits.slice(0, 4);
+            console.log("New Secret Code:", secretCode.join(""));
+        };
+
+        const calculateFeedback = (guess, secret) => {
+          let t = 0; // Taureaux (Bulls)
+          let v = 0; // Vaches (Cows)
+          const tempGuess = [...guess];
+          const tempSecret = [...secret];
+
+          for (let i = 0; i < 4; i++) {
+            if (tempGuess[i] === tempSecret[i]) {
+              t++;
+              tempGuess[i] = null;
+              tempSecret[i] = null;
+            }
+          }
+          for (let i = 0; i < 4; i++) {
+            if (tempGuess[i] !== null) {
+              const vIndex = tempSecret.indexOf(tempGuess[i]);
+              if (vIndex !== -1) {
+                v++;
+                tempSecret[vIndex] = null;
+              }
+            }
+          }
+          return { v, t };
+        };
+
+        const addGuessToHistoryUI = (guess, feedback) => {
+          state.guessCount++;
+          ui.guessCount.textContent = state.guessCount;
+          const rowIndex = state.guessCount;
+
+          // Row for Guesses Column
+          const guessRow = document.createElement("div");
+          guessRow.className =
+            "history-row-item grid grid-cols-4 gap-2 h-10 rounded";
+          guessRow.dataset.rowIndex = rowIndex;
+          guess.forEach((digit) => {
+            const d = document.createElement("div");
+            d.className =
+              "bg-gray-700 rounded flex items-center justify-center text-sm font-semibold";
+            d.textContent = digit;
+            guessRow.appendChild(d);
+          });
+          ui.yourGuessesHistory.appendChild(guessRow);
+
+          // V feedback
+          const vRow = document.createElement("div");
+          vRow.className =
+            "history-row-item h-10 bg-gray-700 rounded flex items-center justify-center text-sm font-semibold";
+          vRow.dataset.rowIndex = rowIndex;
+          vRow.textContent = feedback.v;
+          ui.vFeedbackHistory.appendChild(vRow);
+
+          // T feedback
+          const tRow = document.createElement("div");
+          tRow.className =
+            "history-row-item h-10 bg-gray-700 rounded flex items-center justify-center text-sm font-semibold";
+          tRow.dataset.rowIndex = rowIndex;
+          tRow.textContent = feedback.t;
+          ui.tFeedbackHistory.appendChild(tRow);
+
+          // --- Add hover and click event listeners ---
+          const allRowParts = [guessRow, vRow, tRow];
+          allRowParts.forEach((part) => {
+            // CLICK LOGIC
+            part.addEventListener("click", () => {
+              const rowPartsToToggle = document.querySelectorAll(
+                `[data-row-index="${rowIndex}"]`
+              );
+              const isAlreadySelected = rowPartsToToggle[0].classList.contains(
+                "history-row-selected"
+              );
+
+              // Deselect all other rows first
+              document.querySelectorAll(".history-row-item").forEach((el) => {
+                el.classList.remove("history-row-selected");
+              });
+
+              // Toggle the selected class on the clicked row
+              if (!isAlreadySelected) {
+                rowPartsToToggle.forEach((el) => {
+                  el.classList.add("history-row-selected");
+                });
+              }
             });
 
-            const initNumpad = () => {
-                ui.numberPad.innerHTML = '';
-                const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-                numbers.forEach(num => {
-                    const btn = document.createElement('button');
-                    btn.className = "number-pad-btn bg-gray-700 hover:bg-gray-600 font-bold rounded-lg h-14 text-2xl";
-                    btn.textContent = num;
-                    btn.onclick = () => handleNumpadInput(num.toString());
-                    ui.numberPad.appendChild(btn);
-                });
-            };
-
-            const handleNumpadInput = (value) => {
-                if (state.activeInputIndex > 3 || state.gameOver) return;
-                
-                state.currentGuess[state.activeInputIndex] = value;
-                ui.currentGuessInputs[state.activeInputIndex].value = value;
-                
-                if (state.activeInputIndex < 3) {
-                    state.activeInputIndex++;
-                    updateActiveInput();
-                }
-            };
-            
-            const updateActiveInput = () => {
-                if (state.gameOver) {
-                    ui.currentGuessInputs.forEach(input => input.classList.remove('active'));
-                    return;
-                }
-                ui.currentGuessInputs.forEach((input, index) => {
-                    input.classList.toggle('active', index === state.activeInputIndex);
-                });
-            };
-            
-            const handleClear = () => {
-                 state.currentGuess = ["", "", "", ""];
-                 ui.currentGuessInputs.forEach(input => input.value = "");
-                 state.activeInputIndex = 0;
-                 updateActiveInput();
-            };
-
-            const handleSubmit = () => {
-                if (state.gameOver || state.currentGuess.includes("")) {
-                    showModal(`<h2 class="text-xl font-bold text-center mb-4 text-white">Invalid Guess</h2><p class="text-center text-gray-300">Please enter a complete 4-digit code.</p>`);
-                    return;
-                }
-                
-                const feedback = calculateFeedback(state.currentGuess, computerSecretCode);
-                addGuessToHistoryUI(state.currentGuess, feedback);
-
-                if (feedback.t === 4) {
-                    handleGameOver(true); // Player wins
-                } else {
-                    handleClear();
-                }
-            };
-
-            ui.clearButton.onclick = handleClear;
-            ui.submitButton.onclick = handleSubmit;
-            ui.currentGuessInputs.forEach((input, index) => {
-                input.addEventListener('click', () => {
-                    if(state.gameOver) return;
-                    state.activeInputIndex = index;
-                    updateActiveInput();
+            // HOVER LOGIC
+            part.addEventListener("mouseenter", () => {
+              document
+                .querySelectorAll(`[data-row-index="${rowIndex}"]`)
+                .forEach((el) => {
+                  el.classList.add("history-row-hovered");
                 });
             });
-            
-            // --- Game Setup Flow ---
-            
-            const setCodeModal = () => {
-                let tempCode = ["","","",""];
-                let tempIndex = 0;
 
-                const updateDisplay = () => {
-                    const codeInputs = document.querySelectorAll('.modal-code-input');
-                    codeInputs.forEach((input, i) => {
-                        input.textContent = tempCode[i] || '?';
-                        input.classList.toggle('border-indigo-500', i === tempIndex);
-                        input.classList.toggle('border-gray-600', i !== tempIndex);
-                    });
-                };
-                
-                const handleModalNumInput = (num) => {
-                    if (tempIndex > 3) return;
-                    tempCode[tempIndex] = num;
-                    if(tempIndex < 3) tempIndex++;
-                    updateDisplay();
-                };
-
-                const handleModalClear = () => {
-                    tempCode = ["","","",""];
-                    tempIndex = 0;
-                    updateDisplay();
-                };
-
-                const confirmCode = () => {
-                    if(tempCode.includes("")){
-                        document.getElementById('modal-error').textContent = "Please enter a full 4-digit code.";
-                        return;
-                    }
-                    state.mySecretCode = tempCode;
-                    displayMySecretCode();
-                    hideModal();
-                    startGame();
-                };
-
-                let modalHTML = `
-                    <h2 class="text-2xl font-bold text-center mb-4 text-white">Set Your Secret Code</h2>
-                    <div class="grid grid-cols-4 gap-2 mb-4">
-                        ${[0,1,2,3].map(i => `<div class="modal-code-input aspect-square bg-gray-700 rounded-lg flex items-center justify-center text-3xl font-bold border-2 border-gray-600 transition-all">?</div>`).join('')}
-                    </div>
-                    <div class="grid grid-cols-5 gap-2 mb-4">
-                        ${[1,2,3,4,5,6,7,8,9,0].map(n => `<button class="modal-num-btn number-pad-btn bg-gray-700 hover:bg-gray-600 font-bold rounded-lg h-12 text-xl">${n}</button>`).join('')}
-                    </div>
-                    <div class="flex gap-2">
-                        <button id="modal-clear-btn" class="flex-grow h-12 bg-yellow-500 text-black font-bold rounded-lg text-lg">Clear</button>
-                        <button id="modal-confirm-btn" class="flex-grow h-12 bg-green-500 text-white font-bold rounded-lg text-lg">Confirm</button>
-                    </div>
-                    <p id="modal-error" class="text-red-400 text-center mt-2 h-4"></p>
-                `;
-                
-                showModal(modalHTML, false);
-                updateDisplay();
-
-                document.querySelectorAll('.modal-num-btn').forEach(btn => btn.onclick = () => handleModalNumInput(btn.textContent));
-                document.getElementById('modal-clear-btn').onclick = handleModalClear;
-                document.getElementById('modal-confirm-btn').onclick = confirmCode;
-            };
-
-            const displayMySecretCode = () => {
-                const codeHTML = state.mySecretCode.map(digit => `
-                    <div class="perspective-container">
-                        <div class="card-flip relative w-full aspect-square">
-                            <div class="card-front absolute w-full h-full bg-gray-700 rounded-lg flex items-center justify-center text-2xl font-bold">?</div>
-                            <div class="card-back absolute w-full h-full bg-indigo-500 rounded-lg flex items-center justify-center text-2xl font-bold">${digit}</div>
-                        </div>
-                    </div>
-                `).join('');
-                ui.yourCodeDisplay.innerHTML = codeHTML;
-
-                setTimeout(() => {
-                    document.querySelectorAll('.card-flip').forEach((card, index) => {
-                        setTimeout(() => card.classList.add('is-flipped'), index * 150);
-                    });
-                }, 500);
-            };
-            
-            const startGame = () => {
-                state.gameOver = false;
-                ui.playerInputArea.classList.remove('opacity-50', 'pointer-events-none');
-                updateActiveInput();
-            };
-
-            const calculateFeedback = (guess, secret) => {
-                 let t = 0; // Taureaux (Bulls)
-                 let v = 0; // Vaches (Cows)
-                 const tempGuess = [...guess];
-                 const tempSecret = [...secret];
-
-                 for (let i = 0; i < 4; i++) {
-                     if (tempGuess[i] === tempSecret[i]) {
-                         t++;
-                         tempGuess[i] = null;
-                         tempSecret[i] = null;
-                     }
-                 }
-                 for (let i = 0; i < 4; i++) {
-                    if (tempGuess[i] !== null) {
-                        const vIndex = tempSecret.indexOf(tempGuess[i]);
-                        if (vIndex !== -1) {
-                            v++;
-                            tempSecret[vIndex] = null;
-                        }
-                    }
-                 }
-                return { v, t };
-            };
-
-            const addGuessToHistoryUI = (guess, feedback) => {
-                state.guessCount++;
-                const rowIndex = state.guessCount;
-
-                // Row for Guesses Column
-                const guessRow = document.createElement('div');
-                guessRow.className = 'history-row-item grid grid-cols-4 gap-2 h-10 rounded';
-                guessRow.dataset.rowIndex = rowIndex;
-                guess.forEach(digit => {
-                    const d = document.createElement('div');
-                    d.className = 'bg-gray-700 rounded flex items-center justify-center text-sm font-semibold';
-                    d.textContent = digit;
-                    guessRow.appendChild(d);
+            part.addEventListener("mouseleave", () => {
+              document
+                .querySelectorAll(`[data-row-index="${rowIndex}"]`)
+                .forEach((el) => {
+                  el.classList.remove("history-row-hovered");
                 });
-                ui.yourGuessesHistory.appendChild(guessRow);
+            });
+          });
 
-                // V feedback
-                const vRow = document.createElement('div');
-                vRow.className = 'history-row-item h-10 bg-gray-700 rounded flex items-center justify-center text-sm font-semibold';
-                vRow.dataset.rowIndex = rowIndex;
-                vRow.textContent = feedback.v;
-                ui.vFeedbackHistory.appendChild(vRow);
+          // --- Auto-scroll ---
+          ui.yourGuessesHistory.scrollTop = ui.yourGuessesHistory.scrollHeight;
+        };
 
-                // T feedback
-                const tRow = document.createElement('div');
-                tRow.className = 'history-row-item h-10 bg-gray-700 rounded flex items-center justify-center text-sm font-semibold';
-                tRow.dataset.rowIndex = rowIndex;
-                tRow.textContent = feedback.t;
-                ui.tFeedbackHistory.appendChild(tRow);
-                
-                // --- Add hover and click event listeners ---
-                const allRowParts = [guessRow, vRow, tRow];
-                allRowParts.forEach(part => {
-                    // CLICK LOGIC
-                    part.addEventListener('click', () => {
-                        const rowPartsToToggle = document.querySelectorAll(`[data-row-index="${rowIndex}"]`);
-                        const isAlreadySelected = rowPartsToToggle[0].classList.contains('history-row-selected');
+        const handleGameOver = (playerWon) => {
+          state.gameOver = true;
+          let newBestScore = false;
+          if (playerWon) {
+            const currentScore = state.guessCount;
+            if (state.bestScore === null || currentScore < state.bestScore) {
+              state.bestScore = currentScore;
+              localStorage.setItem("bestScore", currentScore);
+              ui.bestScore.textContent = currentScore;
+              newBestScore = true;
+            }
+          }
 
-                        // Deselect all other rows first
-                        document.querySelectorAll('.history-row-item').forEach(el => {
-                            el.classList.remove('history-row-selected');
-                        });
+          const message = playerWon
+            ? "You Cracked The Code!"
+            : "Better Luck Next Time!";
+          const bgColor = playerWon ? "bg-green-500" : "bg-red-500";
 
-                        // Toggle the selected class on the clicked row
-                        if (!isAlreadySelected) {
-                            rowPartsToToggle.forEach(el => {
-                                el.classList.add('history-row-selected');
-                            });
-                        }
-                    });
-
-                    // HOVER LOGIC
-                    part.addEventListener('mouseenter', () => {
-                        document.querySelectorAll(`[data-row-index="${rowIndex}"]`).forEach(el => {
-                           el.classList.add('history-row-hovered');
-                        });
-                    });
-
-                    part.addEventListener('mouseleave', () => {
-                         document.querySelectorAll(`[data-row-index="${rowIndex}"]`).forEach(el => {
-                            el.classList.remove('history-row-hovered');
-                        });
-                    });
-                });
-                
-                // --- Auto-scroll ---
-                ui.yourGuessesHistory.scrollTop = ui.yourGuessesHistory.scrollHeight;
-            };
-
-            const handleGameOver = (playerWon) => {
-                state.gameOver = true;
-                const message = playerWon ? "You Cracked The Code!" : "Better Luck Next Time!";
-                const bgColor = playerWon ? 'bg-green-500' : 'bg-red-500';
-                
-                ui.playerInputArea.classList.add('opacity-50', 'pointer-events-none');
-                updateActiveInput();
-                
-                const gameOverHTML = `
-                    <h2 class="text-2xl font-bold text-center mb-4 text-white">${message}</h2>
+          ui.playerInputArea.classList.add("opacity-50", "pointer-events-none");
+          updateActiveInput();
+          const gameOverHTML = `
+                    <h2 class="text-2xl font-bold text-center mb-2 text-white">${message}</h2>
+                    ${
+                      newBestScore
+                        ? '<p class="text-center text-yellow-400 font-semibold mb-4">New Best Score!</p>'
+                        : '<div class="mb-6"></div>'
+                    }
                     <div class="text-center mb-6">
-                        <i class="fas ${playerWon ? 'fa-trophy' : 'fa-sad-tear'} text-6xl text-yellow-400"></i>
+                        <i class="fas ${
+                          playerWon ? "fa-trophy" : "fa-sad-tear"
+                        } text-6xl text-yellow-400"></i>
                     </div>
                     <button id="play-again-btn" class="w-full h-12 ${bgColor} text-white font-bold rounded-lg text-lg">Play Again</button>
                 `;
-                showModal(gameOverHTML, false);
+          showModal(gameOverHTML, false);
 
-                document.getElementById('play-again-btn').onclick = () => {
-                    hideModal();
-                    resetGame();
-                };
-            };
-            
-            const resetGame = () => {
-                 state.mySecretCode = [];
-                 state.gameOver = true;
-                 state.guessCount = 0;
-                 handleClear();
-                 
-                 ui.yourGuessesHistory.innerHTML = '';
-                 ui.vFeedbackHistory.innerHTML = '';
-                 ui.tFeedbackHistory.innerHTML = '';
-                 ui.yourCodeDisplay.innerHTML = [0,1,2,3].map(() => `<div class="aspect-square bg-gray-700 rounded-lg flex items-center justify-center text-2xl font-bold">?</div>`).join('');
-                 
-                 ui.playerInputArea.classList.add('opacity-50', 'pointer-events-none');
-                 updateActiveInput();
-                 
-                 setCodeModal();
-            };
-            
-            // --- Synchronized Scrolling ---
-            let isSyncingScroll = false;
-            const scrollableElements = [ui.yourGuessesHistory, ui.vFeedbackHistory, ui.tFeedbackHistory];
+          document.getElementById("play-again-btn").onclick = () => {
+            hideModal();
+            resetGame();
+          };
 
-            const syncScroll = (scrolledElement) => {
-                if (isSyncingScroll) return;
-                isSyncingScroll = true;
+          // const gameOverHTML = `
+          //     <h2 class="text-2xl font-bold text-center mb-4 text-white">${message}</h2>
+          //                         ${newBestScore ? '<p class="text-center text-yellow-400 font-semibold mb-4">New Best Score!</p>' : '<div class="mb-6"></div>'}
 
-                const scrollTop = scrolledElement.scrollTop;
-                scrollableElements.forEach(element => {
-                    if (element !== scrolledElement) {
-                        element.scrollTop = scrollTop;
-                    }
-                });
+          //     <div class="text-center mb-6">
+          //         <i class="fas ${playerWon ? 'fa-trophy' : 'fa-sad-tear'} text-6xl text-yellow-400"></i>
+          //     </div>
+          //     <button id="play-again-btn" class="w-full h-12 ${bgColor} text-white font-bold rounded-lg text-lg">Play Again</button>
+          // `;
+          // showModal(gameOverHTML, false);
 
-                // Use requestAnimationFrame to reset the flag after the browser has painted the changes
-                requestAnimationFrame(() => {
-                    isSyncingScroll = false;
-                });
-            };
+          // document.getElementById('play-again-btn').onclick = () => {
+          //     hideModal();
+          //     resetGame();
+          // };
+        };
 
-            scrollableElements.forEach(element => {
-                element.addEventListener('scroll', () => syncScroll(element));
-            });
+        const resetGame = () => {
+          state.gameOver = true;
+          state.guessCount = 0;
+          ui.guessCount.textContent = "0";
+          handleClear();
 
+          ui.yourGuessesHistory.innerHTML = "";
+          ui.vFeedbackHistory.innerHTML = "";
+          ui.tFeedbackHistory.innerHTML = "";
 
-            // --- Game Initialization ---
-            initNumpad();
-            setCodeModal();
+          ui.playerInputArea.classList.add("opacity-50", "pointer-events-none");
+          updateActiveInput();
+
+          startGame();
+        };
+        const loadBestScore = () => {
+          const savedBest = localStorage.getItem("bestScore");
+          if (savedBest) {
+            state.bestScore = parseInt(savedBest, 10);
+            ui.bestScore.textContent = state.bestScore;
+          }
+        };
+
+        // --- Synchronized Scrolling ---
+        let isSyncingScroll = false;
+        const scrollableElements = [
+          ui.yourGuessesHistory,
+          ui.vFeedbackHistory,
+          ui.tFeedbackHistory,
+        ];
+
+        const syncScroll = (scrolledElement) => {
+          if (isSyncingScroll) return;
+          isSyncingScroll = true;
+
+          const scrollTop = scrolledElement.scrollTop;
+          scrollableElements.forEach((element) => {
+            if (element !== scrolledElement) {
+              element.scrollTop = scrollTop;
+            }
+          });
+
+          // Use requestAnimationFrame to reset the flag after the browser has painted the changes
+          requestAnimationFrame(() => {
+            isSyncingScroll = false;
+          });
+        };
+
+        scrollableElements.forEach((element) => {
+          element.addEventListener("scroll", () => syncScroll(element));
         });
+
+        // --- Game Initialization ---
+        initNumpad();
+        loadBestScore();
+        startGame();
+      });
     </script>
-</body>
+  </body>
 </html>
