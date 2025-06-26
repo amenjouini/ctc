@@ -56,22 +56,11 @@
       }
 
       /* Custom scrollbar styling */
-      .scroll-container::-webkit-scrollbar {
-        width: 8px;
-      }
-      .scroll-container::-webkit-scrollbar-track {
-        background: #1f2937; /* Slightly darker than the container */
-      }
-      .scroll-container::-webkit-scrollbar-thumb {
-        background-color: #4b5563;
-        border-radius: 4px;
-      }
-      
       .guess-history::-webkit-scrollbar {
         width: 8px;
       }
       .guess-history::-webkit-scrollbar-track {
-        background: #1f2937;
+        background: #1f2937; /* Slightly darker than the container */
       }
       .guess-history::-webkit-scrollbar-thumb {
         background-color: #4b5563;
@@ -153,7 +142,7 @@
   >
     <div
       id="game-container"
-      class="w-full max-w-lg mx-auto bg-gray-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden h-full max-h-[950px]"
+      class="w-full max-w-lg mx-auto bg-gray-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden h-full max-h-[900px] md:h-auto"
     >
       <!-- Top Bar -->
       <header
@@ -186,100 +175,98 @@
       </section>
 
       <!-- Main Game Area -->
-      <main class="flex-grow p-4 overflow-y-auto scroll-container min-h-0">
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-            <!-- Guesses Area (Left) -->
-            <div class="md:col-span-7 grid grid-cols-[4fr_1fr_1fr] gap-2">
-              <!-- Your Guesses Column -->
-              <div class="flex flex-col">
-                <h2 class="text-sm font-semibold text-center text-gray-400 mb-2">
-                  YOUR GUESSES
-                </h2>
-                <div
-                  id="your-guesses-history"
-                  class="guess-history bg-gray-900/50 rounded-lg p-2 flex-grow h-64 md:h-auto overflow-y-auto space-y-2"
+      <main class="grid md:grid-cols-12 gap-4 p-4 flex-grow min-h-0">
+        <!-- Guesses Area (Left) -->
+        <div class="md:col-span-7 grid grid-cols-[4fr_1fr_1fr] gap-2">
+          <!-- Your Guesses Column -->
+          <div class="flex flex-col min-h-0">
+            <h2 class="text-sm font-semibold text-center text-gray-400 mb-2">
+              YOUR GUESSES
+            </h2>
+            <div
+              id="your-guesses-history"
+              class="guess-history bg-gray-900/50 rounded-lg p-2 flex-grow h-full overflow-y-auto space-y-2"
+            >
+              <!-- History will be populated here -->
+            </div>
+          </div>
+
+          <!-- Feedback V Column -->
+          <div class="flex flex-col min-h-0">
+            <h2 class="text-sm font-semibold text-center text-gray-400 mb-2">
+              V
+            </h2>
+            <div
+              id="v-feedback-history"
+              class="guess-history bg-gray-900/50 rounded-lg p-2 flex-grow h-full overflow-y-auto space-y-2"
+            >
+              <!-- V feedback -->
+            </div>
+          </div>
+
+          <!-- Feedback T Column -->
+          <div class="flex flex-col min-h-0">
+            <h2 class="text-sm font-semibold text-center text-gray-400 mb-2">
+              T
+            </h2>
+            <div
+              id="t-feedback-history"
+              class="guess-history bg-gray-900/50 rounded-lg p-2 flex-grow h-full overflow-y-auto space-y-2"
+            >
+              <!-- T feedback -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats & Instructions Area (Right) -->
+        <div class="md:col-span-5 flex flex-col gap-4">
+          <div class="bg-gray-900/50 rounded-lg p-3">
+            <h2
+              class="text-sm font-semibold text-center text-gray-400 mb-2 uppercase tracking-wider"
+            >
+              Stats
+            </h2>
+            <div class="space-y-2">
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-300">Guesses:</span>
+                <span id="guess-count" class="font-bold text-lg text-white"
+                  >0</span
                 >
-                  <!-- History will be populated here -->
-                </div>
               </div>
 
-              <!-- Feedback V Column -->
-              <div class="flex flex-col">
-                <h2 class="text-sm font-semibold text-center text-gray-400 mb-2">
-                  V
-                </h2>
-                <div
-                  id="v-feedback-history"
-                  class="guess-history bg-gray-900/50 rounded-lg p-2 flex-grow h-64 md:h-auto overflow-y-auto space-y-2"
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-300">Best Score:</span>
+                <span id="best-score" class="font-bold text-lg text-yellow-400"
+                  >--</span
                 >
-                  <!-- V feedback -->
-                </div>
-              </div>
-
-              <!-- Feedback T Column -->
-              <div class="flex flex-col">
-                <h2 class="text-sm font-semibold text-center text-gray-400 mb-2">
-                  T
-                </h2>
-                <div
-                  id="t-feedback-history"
-                  class="guess-history bg-gray-900/50 rounded-lg p-2 flex-grow h-64 md:h-auto overflow-y-auto space-y-2"
-                >
-                  <!-- T feedback -->
-                </div>
               </div>
             </div>
-
-            <!-- Stats & Instructions Area (Right) -->
-            <div class="md:col-span-5 flex flex-col gap-4">
-              <div class="bg-gray-900/50 rounded-lg p-3">
-                <h2
-                  class="text-sm font-semibold text-center text-gray-400 mb-2 uppercase tracking-wider"
+          </div>
+          <div class="bg-gray-900/50 rounded-lg p-3 flex-grow">
+            <h2
+              class="text-sm font-semibold text-center text-gray-400 mb-3 uppercase tracking-wider"
+            >
+              How to Play
+            </h2>
+            <ul class="space-y-3 text-sm">
+              <li class="flex items-start">
+                <span class="font-bold text-indigo-400 w-6 text-center mr-2"
+                  >V</span
                 >
-                  Stats
-                </h2>
-                <div class="space-y-2">
-                  <div class="flex justify-between items-center text-sm">
-                    <span class="text-gray-300">Guesses:</span>
-                    <span id="guess-count" class="font-bold text-lg text-white"
-                      >0</span
-                    >
-                  </div>
-
-                  <div class="flex justify-between items-center text-sm">
-                    <span class="text-gray-300">Best Score:</span>
-                    <span id="best-score" class="font-bold text-lg text-yellow-400"
-                      >--</span
-                    >
-                  </div>
-                </div>
-              </div>
-              <div class="bg-gray-900/50 rounded-lg p-3 flex-grow">
-                <h2
-                  class="text-sm font-semibold text-center text-gray-400 mb-3 uppercase tracking-wider"
+                <span class="text-gray-300"
+                  >Correct number, but in the wrong position.</span
                 >
-                  How to Play
-                </h2>
-                <ul class="space-y-3 text-sm">
-                  <li class="flex items-start">
-                    <span class="font-bold text-indigo-400 w-6 text-center mr-2"
-                      >V</span
-                    >
-                    <span class="text-gray-300"
-                      >Correct number, but in the wrong position.</span
-                    >
-                  </li>
-                  <li class="flex items-start">
-                    <span class="font-bold text-green-400 w-6 text-center mr-2"
-                      >T</span
-                    >
-                    <span class="text-gray-300"
-                      >Correct number AND in the correct position.</span
-                    >
-                  </li>
-                </ul>
-              </div>
-            </div>
+              </li>
+              <li class="flex items-start">
+                <span class="font-bold text-green-400 w-6 text-center mr-2"
+                  >T</span
+                >
+                <span class="text-gray-300"
+                  >Correct number AND in the correct position.</span
+                >
+              </li>
+            </ul>
+          </div>
         </div>
       </main>
 
@@ -334,7 +321,7 @@
         </div>
       </footer>
     </div>
-    
+
     <!-- Modals -->
     <div
       id="main-modal"
@@ -347,7 +334,6 @@
       </div>
     </div>
 
-
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         // --- Game State ---
@@ -359,20 +345,20 @@
           guessCount: 0,
           bestScore: null,
         };
-        
+
         // --- UI Elements ---
         const ui = {
           gameStatus: document.getElementById("game-status"),
           yourGuessesHistory: document.getElementById("your-guesses-history"),
           vFeedbackHistory: document.getElementById("v-feedback-history"),
           tFeedbackHistory: document.getElementById("t-feedback-history"),
+          numberPadButtons: {},
           guessCount: document.getElementById("guess-count"),
           bestScore: document.getElementById('best-score'),
           currentGuessInputs: document.querySelectorAll(
             "#current-guess-inputs .guess-input"
           ),
           numberPad: document.getElementById("number-pad"),
-          numberPadButtons: {}, // To store references to the numpad buttons
           clearButton: document.getElementById("clear-button"),
           submitButton: document.getElementById("submit-button"),
           modal: document.getElementById("main-modal"),
@@ -418,7 +404,6 @@
             ui.numberPadButtons[num] = btn; // Store button reference
           });
         };
-
         const updateNumpadState = () => {
             const usedNumbers = new Set(state.currentGuess.filter(n => n !== ""));
 
