@@ -1,0 +1,385 @@
+/* General Body and Game Container */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #333;
+}
+
+.game-container {
+    width: 100%;
+    max-width: 480px; /* Mobile-first focus */
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Ensures contained elements don't break layout */
+}
+
+/* Top Bar */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background-color: #e9e9e9;
+    border-bottom: 1px solid #dcdcdc;
+}
+.menu-button, .gallery-icon-placeholder, .call-icon-placeholder, .opponent-icon-placeholder {
+    font-size: 1.6em; /* Placeholder size */
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #555;
+}
+.game-title {
+    font-size: 1.25em;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+}
+
+/* Opponent Info Bar */
+.opponent-info-bar {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #dcdcdc;
+}
+.opponent-name {
+    margin-left: 8px;
+    margin-right: auto;
+    font-weight: 500;
+    color: #444;
+}
+
+/* Main Game Area Grid */
+.main-game-area {
+    display: grid;
+    /* Columns: Guesses | V | T | Opponent Side */
+    grid-template-columns: 1fr 40px 40px 1fr; /* Flexible main columns, fixed V/T */
+    gap: 8px;
+    padding: 12px;
+    align-items: start;
+    flex-grow: 1; /* Allows this area to take up available vertical space */
+    background-color: #fff; /* Main game background */
+}
+
+.guesses-column, .feedback-display-column, .opponent-info-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Spacing between elements within a column */
+}
+
+.section-title {
+    font-weight: bold;
+    text-align: center;
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 4px;
+    padding: 4px;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+}
+
+/* Guess History and Feedback Lists */
+#guesses-history-list, #v-feedback-list, #t-feedback-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px; /* Aligns with guess row heights + margins */
+    min-height: 220px; /* Adjust based on desired rows before scroll */
+    padding-right: 4px; /* Space for scrollbar */
+    border: 1px solid #e0e0e0;
+    padding: 5px;
+    border-radius: 3px;
+    background-color: #fdfdfd;
+        max-height: 280px; /* Or your desired height */
+    overflow-y: auto;
+    /* Add some explicit styling for scrollbars if you want them consistent (optional) */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #aaa #f0f0f0; /* Firefox */
+}
+
+#guesses-history-list::-webkit-scrollbar,
+#v-feedback-list::-webkit-scrollbar,
+#t-feedback-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+#guesses-history-list::-webkit-scrollbar-track,
+#v-feedback-list::-webkit-scrollbar-track,
+#t-feedback-list::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+#guesses-history-list::-webkit-scrollbar-thumb,
+#v-feedback-list::-webkit-scrollbar-thumb,
+#t-feedback-list::-webkit-scrollbar-thumb {
+    background-color: #aaa;
+    border-radius: 4px;
+    border: 2px solid #f0f0f0; /* Creates padding around thumb */
+}
+
+/* Ensure list items have consistent height to align scrolling */
+.history-item .guess-boxes,
+#v-feedback-list div,
+#t-feedback-list div {
+    height: 32px; /* Or your consistent item height */
+    /* ... other styles ... */
+}
+
+/* Styling for individual historical guess rows */
+.history-item .guess-boxes {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    height: 32px; /* Consistent height */
+}
+.history-item .guess-boxes span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #d8d8d8;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+/* V and T column headers and feedback items */
+.column-header {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2em;
+    padding: 5px 0;
+    color: #333;
+    border-bottom: 2px solid #555;
+    margin-bottom: 5px;
+}
+#v-feedback-list div, #t-feedback-list div { /* Individual V/T scores */
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: 500;
+    height: 32px; /* Match guess box height */
+    line-height: 32px;
+    border: 1px solid #e0e0e0;
+    border-radius: 3px;
+    background-color: #f9f9f9;
+}
+.feedback-value-placeholder { /* Aligns with current input row */
+    height: 36px; /* Match current guess input area */
+    border: 1px dashed #ccc; /* Optional: visual guide */
+    border-radius: 3px;
+}
+
+
+/* Current Guess Input Area */
+#current-guess-input-area, .opponent-guess-boxes {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+}
+.code-inputs input{
+    width: 40px;
+    height: 40px;
+    text-align: center;
+
+
+    gap:5px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    color: #333;
+}
+#current-guess-input-area input, .opponent-guess-boxes input {
+    width: 100%;
+    height: 36px;
+    text-align: center;
+    font-size: 1.3em;
+    font-weight: bold;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    box-sizing: border-box;
+    color: #333;
+}
+#current-guess-input-area.current-guess-row input { /* Red border for current guess */
+    border: 2px solid red !important;
+}
+.opponent-guess-boxes input { /* Red border for opponent's guess */
+    border: 2px solid red !important;
+    background-color: #f0f0f0; /* Indicate readonly differently */
+}
+.code-inputs input[type="password"] {
+    letter-spacing: 0.3em; /* For password dot effect */
+}
+
+/* Opponent Info Column specifics */
+.your-code-area, .opponent-guess-display-area {
+    padding: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+.live-chat-placeholder {
+    text-align: center;
+    padding: 10px;
+    color: #888;
+    font-style: italic;
+    border: 1px dashed #ccc;
+    border-radius: 3px;
+    margin-top: auto; /* Pushes to bottom of column if space */
+}
+
+/* Bottom Bar: Instructions & Number Pad */
+.bottom-bar {
+    padding: 10px;
+    border-top: 1px solid #dcdcdc;
+    background-color: #e9e9e9;
+}
+.instructions-button {
+    display: block;
+    margin: 0 auto 10px auto;
+    padding: 8px 15px;
+    border: 1px solid #c0c0c0;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    color: #444;
+}
+.instructions-button i { font-style: normal; } /* If using <i> for icon */
+
+.number-pad-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.number-pad, .number-pad-modal {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; /* Allow wrapping if needed */
+    gap: 6px;
+}
+/* style.css - Update or add these styles for numpad buttons */
+.number-pad button, .number-pad-modal button {
+    width: 50px;  /* Adjust size as needed for your images */
+    height: 50px; /* Adjust size as needed for your images */
+    border: 1px solid #c0c0c0;
+    background-color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 0; /* Remove padding to let image fill */
+    display: flex; /* To center image if needed, or use background-image */
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Ensure image doesn't spill out */
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.number-pad button:hover, .number-pad-modal button:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+.number-pad button:active, .number-pad-modal button:active {
+    background-color: #e0e0e0;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+}
+
+.number-pad button img, .number-pad-modal button img {
+    max-width: 100%;
+    max-height: 100%;
+    display: block; /* Remove extra space below image if it's inline */
+}
+
+.action-buttons-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.action-button {
+    padding: 10px 18px;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.2s;
+}
+#submit-guess-button { background-color: #28a745; } /* Green */
+#submit-guess-button:hover { background-color: #218838; }
+#clear-guess-button { background-color: #ffc107; color: #212529; } /* Yellow */
+#clear-guess-button:hover { background-color: #e0a800; }
+
+
+/* Modal Styling */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5); /* Dim background */
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background-color: #fefefe;
+    padding: 25px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 380px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+}
+.modal-code-entry {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+.modal-code-input {
+    height: 40px;
+    text-align: center;
+    font-size: 1.5em;
+
+}
+#confirm-code-button {
+    padding: 12px 20px;
+    background-color: #007bff; /* Blue */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    margin-top: 15px;
+    transition: background-color 0.2s;
+}
+#confirm-code-button:hover { background-color: #0056b3; }
+.error-message {
+    color: #dc3545; /* Red */
+    font-size: 0.9em;
+    margin-top: 10px;
+    min-height: 1.2em; /* Reserve space */
+}
+
+/* Helper class for active input focus styling (optional) */
+.active-input {
+    border-color: #007bff !important;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25) !important;
+}
