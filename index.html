@@ -18,6 +18,8 @@
       body {
         height: 100%;
         overflow: hidden; /* Prevents page-level scrolling */
+        margin: 0;
+        padding: 0;
       }
       body {
         font-family: "Inter", sans-serif;
@@ -82,6 +84,12 @@
       .guess-history {
         scrollbar-gutter: stable;
       }
+
+      #game-container {
+      width: 100%;
+      height: 100dvh; /* Use dynamic viewport height */
+      display: flex;
+    }
 
       /* Hide scrollbar for non-T columns but keep functionality */
       #your-guesses-history::-webkit-scrollbar,
